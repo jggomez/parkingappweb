@@ -76,7 +76,7 @@ $(() => {
     await parqueaderoObj.consultarTodosParquedaderos(mostrarParqueadero);
   }
 
-  function mostrarParqueadero(parqueadero) {    
+  function mostrarParqueadero(parqueadero) {
     let parqueaderoHtml = "";
     if (parqueadero.libre) {
       parqueaderoHtml = Utilidad.obtenerTemplateParqueaderoVacio(
