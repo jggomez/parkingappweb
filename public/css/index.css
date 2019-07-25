@@ -52,6 +52,17 @@
   color: #fff;
   font-size: 15px;
 }
+.btnSalida {
+  background: #f57f17 !important;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: bold;
+  transition: 0.5s;
+}
+.btnSalida:hover {
+  background: #00675b;
+  color: #fff;
+  font-size: 15px;
+}
 .btnPpal {
   background: #f57f17 !important;
   font-family: 'Montserrat', sans-serif;
@@ -448,6 +459,10 @@ label
   .parqueaderos .parqueadero .parqueadero-descripcion {
     text-align: center;
     height: 40px;
+  }
+  .parqueaderos .parqueadero .parqueadero-descripcion-salida {
+    text-align: center;
+    height: 80px;
   }
   .footer .contenedor-footer {
     display: flex;

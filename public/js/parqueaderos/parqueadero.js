@@ -42,27 +42,30 @@ class Parqueadero {
   }
 
   async crearSalida(
-    uid,
-    idParqueadero,
-    nombreCliente,
-    placa,
-    celularCliente,
-    observacion) {
+    idEntrada,
+    fechaSalida,
+    costo,
+    idParqueadero) {
     try {
-      const refDoc = await this.db
-        .collection('salidas')
-        .add({
-          uid: uid,
-          idparqueadero: idParqueadero,
-          nombrecliente: nombreCliente,
-          celularcliente: celularCliente,
-          placa: placa,
-          observacion: observacion,
-          fecha: firebase.firestore.FieldValue.serverTimestamp()
-        })
 
-      console.log(`Id de la salida => ${refDoc.id}`)
-      return refDoc.id
+      await this.db
+        .collection('entradas')
+        .doc(idEntrada)
+        .set({
+          salida: {
+            costo: costo,
+            fechaSalida: fechaSalida
+          }
+        }, { merge: true });
+
+      await this.db
+        .collection('parqueaderos')
+        .doc(idParqueadero)
+        .update({
+          "libre": true
+        });
+
+      return true
 
     } catch (error) {
       console.error(`Error creando la salida => ${error}`)
@@ -74,9 +77,10 @@ class Parqueadero {
       await this.db
         .collection('parqueaderos')
         .orderBy('nombre', 'asc')
-        .onSnapshot((parqueaderos) => {     
-          
+        .onSnapshot((parqueaderos) => {
+
           $('#parqueaderos').empty();
+          console.log("limpia");
 
           parqueaderos.forEach(async (parqueadero) => {
 
@@ -106,7 +110,8 @@ class Parqueadero {
                 observacion: entradaParqueadero.observacion,
                 imagenLink: entradaParqueadero.imagenlink,
                 fecha: entradaParqueadero.fecha,
-                id: parqueadero.id
+                id: parqueadero.id,
+                idEntrada: entradasParqueadero.docs[0].id
               });
             }
 
@@ -125,13 +130,12 @@ class Parqueadero {
         .collection('parqueaderos')
         .orderBy('nombre', 'asc')
         .where('libre', '==', true)
-        .onSnapshot((parqueaderos) => {   
-          
+        .onSnapshot((parqueaderos) => {
+
           $('#parqueaderos').empty();
 
           parqueaderos.forEach((parqueadero) => {
             const parqueaderoData = parqueadero.data();
-            console.log(parqueaderoData);
             fntCallBack({
               nombreParqueadero: parqueaderoData.nombre,
               libre: parqueaderoData.libre,
@@ -169,6 +173,7 @@ class Parqueadero {
           sessionStorage.setItem('imgNewEntrada', url)
 
         } catch (err) {
+          console.error(err);
           Materialize.toast(`Error obteniendo downloadURL = > ${err}`, 4000)
         }
       }

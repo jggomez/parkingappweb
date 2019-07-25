@@ -1,7 +1,5 @@
 $(() => {
 
-  obtenerTodosParqueaderos();
-
   $('#parqueaderos').on('click', '#btnEntrada', function (evt) {
 
     $('#nombreClienteEntrada').val('')
@@ -11,7 +9,7 @@ $(() => {
     $('#btnUploadFile').val('')
     $('.determinate').attr('style', `width: 0%`)
 
-    sessionStorage.setItem('imgNewEntrada', null)    
+    sessionStorage.setItem('imgNewEntrada', null)
     sessionStorage.setItem('idParqueadero', $(this).data('id'))
 
     const user = firebase.auth().currentUser
@@ -22,6 +20,39 @@ $(() => {
     }
 
     $('#modalEntrada').modal('open')
+  })
+
+  $('#parqueaderos').on('click', '#btnSalida', function (evt) {
+    const user = firebase.auth().currentUser
+
+    if (user == null) {
+      Materialize.toast(`Para crear la entrada debes estar autenticado`, 4000)
+      return
+    }
+
+    console.log($(this).data('identrada'));
+
+    /*var calcularCostoParqueo =
+      firebase.functions().httpsCallable('calcularCostoParqueo');
+
+    const resp = await calcularCostoParqueo({
+      idEntrada: $(this).data('idEntrada'),
+      fechaSalida: firebase.firestore.FieldValue.serverTimestamp();
+    });
+
+    const costo = resp.data.costo;*/
+    const costo = 0;
+
+    sessionStorage.setItem('costo', costo);
+    sessionStorage.setItem('idEntrada', $(this).data('identrada'));
+    sessionStorage.setItem('idParqueadero', $(this).data('id'));
+
+    const fechaActual = Utilidad.obtenerFechaHoraActual();
+
+    $('#lblHoraSalida').html(`Hora Salida: ${fechaActual}`);
+    $('#lblCosto').html(`Costo: $ ${costo} pesos`);
+
+    $('#modalSalida').modal('open');
   })
 
   $('#btnTodoParqueaderos').click(() => {
@@ -43,8 +74,8 @@ $(() => {
     await parqueaderoObj.consultarTodosParquedaderos(mostrarParqueadero);
   }
 
-  function mostrarParqueadero(parqueadero) {
-    let parqueaderoHtml = "";    
+  function mostrarParqueadero(parqueadero) {    
+    let parqueaderoHtml = "";
     if (parqueadero.libre) {
       parqueaderoHtml = Utilidad.obtenerTemplateParqueaderoVacio(
         parqueadero.nombreParqueadero,
@@ -59,7 +90,8 @@ $(() => {
         parqueadero.observacion,
         parqueadero.imagenLink,
         Utilidad.obtenerFecha(parqueadero.fecha.toDate()),
-        parqueadero.id
+        parqueadero.id,
+        parqueadero.idEntrada
       )
     }
     $('#parqueaderos').append(parqueaderoHtml);
@@ -81,11 +113,6 @@ $(() => {
   $('#btnRegistroEntrada').click(async () => {
     const parqueaderoObj = new Parqueadero();
     const user = firebase.auth().currentUser;
-
-    if (user == null) {
-      Materialize.toast(`Para crear la entrada debes estar autenticado`, 4000)
-      return
-    }
 
     const nombreCliente = $('#nombreClienteEntrada').val();
     const placaCarro = $('#placaCarroEntrada').val();
@@ -114,6 +141,36 @@ $(() => {
 
     } catch (error) {
       console.error(`Error creando la entrada => ${error}`)
+    }
+  })
+
+  $('#btnRegistroSalida').click(async () => {
+    const parqueaderoObj = new Parqueadero();
+
+    const fechaSalida = firebase.firestore.FieldValue.serverTimestamp();
+    const costo = sessionStorage.getItem('costo');
+    const idEntrada = sessionStorage.getItem('idEntrada');
+    const idParqueadero = sessionStorage.getItem('idParqueadero');
+
+    const trace = firebase.performance().trace('RegistroSalida');
+    trace.start();
+
+    try {
+      await parqueaderoObj
+        .crearSalida(
+          idEntrada,
+          fechaSalida,
+          costo,
+          idParqueadero
+        );
+
+      trace.stop();
+
+      Materialize.toast(`Salida de vehículo creada correctamente`, 4000)
+      $('.modal').modal('close')
+
+    } catch (error) {
+      console.error(`Error creando la salida => ${error}`)
     }
   })
 

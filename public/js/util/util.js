@@ -1,22 +1,38 @@
 class Utilidad {
 
-  static obtenerFecha(timeStamp) {
-    const d = new Date(timeStamp)
-    let month = '' + (d.getMonth() + 1)
-    let day = '' + d.getDate()
-    let year = d.getFullYear()
+    static obtenerFecha(timeStamp) {
+        const d = new Date(timeStamp)
+        let month = '' + (d.getMonth() + 1)
+        let day = '' + d.getDate()
+        let year = d.getFullYear()
 
-    if (month.length < 2) month = '0' + month
-    if (day.length < 2) day = '0' + day
+        if (month.length < 2) month = '0' + month
+        if (day.length < 2) day = '0' + day
 
-    return [day, month, year].join('/')
-  }
+        return [day, month, year].join('/')
+    }
 
-  static obtenerTemplateParqueaderoVacio(
-    nombreParqueadero,
-    idParqueadero
-  ) {
-    return `<article class="parqueadero" data-id=${idParqueadero}>
+    static obtenerFechaHoraActual() {
+        let d = new Date();
+        let month = '' + (d.getMonth() + 1);
+        let day = '' + d.getDate();
+        let year = d.getFullYear();
+        let hora = d.getHours();
+        let minutos = d.getMinutes();
+
+        if (month.length < 2) month = '0' + month
+        if (day.length < 2) day = '0' + day
+        if (hora.length < 2) hora = '0' + hora
+        if (minutos.length < 2) minutos = '0' + minutos
+
+        return [day, month, year].join('/').concat(` ${hora}:${minutos}`)
+    }
+
+    static obtenerTemplateParqueaderoVacio(
+        nombreParqueadero,
+        idParqueadero
+    ) {
+        return `<article class="parqueadero" data-id=${idParqueadero}>
       <div class="parqueadero-titulo">
           <h5>${nombreParqueadero}</h5>
       </div>
@@ -38,19 +54,20 @@ class Utilidad {
       <div class="parqueadero-footer container">     
       </div>
   </article>`
-  }
+    }
 
-  static obtenerParqueaderoTemplate(
-    nombreParqueadero,
-    nombreCliente,
-    celularCliente,
-    placa,
-    observacion,
-    imagenLink,
-    fecha,
-    idParqueadero
-  ) {
-    return `<article class="parqueadero" data-id=${idParqueadero}>
+    static obtenerParqueaderoTemplate(
+        nombreParqueadero,
+        nombreCliente,
+        celularCliente,
+        placa,
+        observacion,
+        imagenLink,
+        fecha,
+        idParqueadero,
+        idEntrada
+    ) {
+        return `<article class="parqueadero" data-id=${idParqueadero}>
             <div class="parqueadero-ocupado-titulo">
                 <h5>${nombreParqueadero}</h5>
             </div>
@@ -64,8 +81,9 @@ class Utilidad {
             <div class="parqueadero-ocupado-placa">
                 <h6>${placa}</h6>                          
             </div>
-            <div class="parqueadero-descripcion">
+            <div class="parqueadero-descripcion-salida">
                 <p>${observacion}</p>
+                <a id="btnSalida" data-id=${idParqueadero} data-identrada=${idEntrada} class="modal-trigger waves-effect waves-light btn btnSalida">Crear Salida</a>
             </div>
             <div class="parqueadero-ocupado-footer container">
                 <div class="row">
@@ -78,6 +96,6 @@ class Utilidad {
                 </div>
             </div>
         </article>`
-  }
+    }
 
 }
