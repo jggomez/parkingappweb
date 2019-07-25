@@ -1,5 +1,7 @@
 $(() => {
 
+  obtenerTodosParqueaderos();
+
   $('#parqueaderos').on('click', '#btnEntrada', function (evt) {
 
     $('#nombreClienteEntrada').val('')
