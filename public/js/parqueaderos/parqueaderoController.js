@@ -24,7 +24,7 @@ $(() => {
     $('#modalEntrada').modal('open')
   })
 
-  $('#parqueaderos').on('click', '#btnSalida', function (evt) {
+  $('#parqueaderos').on('click', '#btnSalida', async function (evt) {
     const user = firebase.auth().currentUser
 
     if (user == null) {
@@ -32,18 +32,18 @@ $(() => {
       return
     }
 
-    console.log($(this).data('identrada'));
+    const idEntrada = $(this).data('identrada');
+    console.log(idEntrada);
 
-    /*var calcularCostoParqueo =
+    const calcularCostoParqueo =
       firebase.functions().httpsCallable('calcularCostoParqueo');
 
     const resp = await calcularCostoParqueo({
-      idEntrada: $(this).data('idEntrada'),
-      fechaSalida: firebase.firestore.FieldValue.serverTimestamp();
+      idEntrada: idEntrada
     });
 
-    const costo = resp.data.costo;*/
-    const costo = 0;
+    const costo = resp.data.costo;
+    console.log(`Costo => ${costo}`)
 
     sessionStorage.setItem('costo', costo);
     sessionStorage.setItem('idEntrada', $(this).data('identrada'));
@@ -57,16 +57,20 @@ $(() => {
     $('#modalSalida').modal('open');
   })
 
-  $('#btnTodoParqueaderos').click(() => {
+  $('#btnTodoParqueaderos').click(async () => {
     $('#tituloParqueadero').text('Todos los Parqueaderos');
-    obtenerTodosParqueaderos();
+    const parqueaderoObj = new Parqueadero();
+    await parqueaderoObj.consultarTodosParquedaderosUnaVez(mostrarParqueadero);
   })
 
   $('#btnParqueaderoLibre').click(async () => {
     $('#tituloParqueadero').text('Parqueaderos Libres');
     const parqueaderoObj = new Parqueadero();
     $('#parqueaderos').empty();
-    await parqueaderoObj.consultarParqueaderoLibres(mostrarParqueadero);
+    const lst = await parqueaderoObj.consultarParqueaderoLibres();
+    lst.forEach(parqueadero => {      
+      mostrarParqueadero(parqueadero);
+    })
   })
 
   async function obtenerTodosParqueaderos() {
@@ -153,6 +157,8 @@ $(() => {
     const costo = sessionStorage.getItem('costo');
     const idEntrada = sessionStorage.getItem('idEntrada');
     const idParqueadero = sessionStorage.getItem('idParqueadero');
+
+    $('#parqueaderos').empty();
 
     const trace = firebase.performance().trace('RegistroSalida');
     trace.start();

@@ -124,27 +124,76 @@ class Parqueadero {
     }
   }
 
+  async consultarTodosParquedaderosUnaVez(fntCallBack) {
+    try {
+      const parqueaderos = await this.db
+        .collection('parqueaderos')
+        .orderBy('nombre', 'asc')
+        .get();
+
+      $('#parqueaderos').empty();
+
+      parqueaderos.forEach(async (parqueadero) => {
+
+        const parqueaderoData = parqueadero.data();
+
+        const entradasParqueadero = await this.db
+          .collection('entradas')
+          .where('idparqueadero', '==', parqueadero.id)
+          .orderBy('fecha', 'desc')
+          .limit(1)
+          .get();
+
+        if (parqueaderoData.libre === true) {
+          fntCallBack({
+            nombreParqueadero: parqueaderoData.nombre,
+            libre: parqueaderoData.libre,
+            id: parqueadero.id
+          });
+        } else {
+          const entradaParqueadero = entradasParqueadero.docs[0].data();
+          fntCallBack({
+            nombreParqueadero: parqueaderoData.nombre,
+            libre: parqueaderoData.libre,
+            nombreCliente: entradaParqueadero.nombrecliente,
+            celularCliente: entradaParqueadero.celularcliente,
+            placa: entradaParqueadero.placa,
+            observacion: entradaParqueadero.observacion,
+            imagenLink: entradaParqueadero.imagenlink,
+            fecha: entradaParqueadero.fecha,
+            id: parqueadero.id,
+            idEntrada: entradasParqueadero.docs[0].id
+          });
+        }
+
+      });
+
+    } catch (error) {
+      console.error(`Error consultando todos los parqueaderos => ${error}`)
+    }
+  }
+
   async consultarParqueaderoLibres(fntCallBack) {
     try {
-      await this.db
+      const parqueaderos = await this.db
         .collection('parqueaderos')
         .orderBy('nombre', 'asc')
         .where('libre', '==', true)
-        .onSnapshot((parqueaderos) => {
+        .get();
 
-          $('#parqueaderos').empty();
+      const lst = [];
 
-          parqueaderos.forEach((parqueadero) => {
-            const parqueaderoData = parqueadero.data();
-            fntCallBack({
-              nombreParqueadero: parqueaderoData.nombre,
-              libre: parqueaderoData.libre,
-              id: parqueadero.id
-            });
-
-          });
-
+      parqueaderos.forEach((parqueadero) => {
+        const parqueaderoData = parqueadero.data();
+        lst.push({
+          nombreParqueadero: parqueaderoData.nombre,
+          libre: parqueaderoData.libre,
+          id: parqueadero.id
         });
+
+      });
+
+      return lst;
 
     } catch (error) {
       console.error(`Error consultando todos los parqueaderos libres => ${error}`)
