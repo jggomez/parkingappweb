@@ -32,6 +32,6 @@ messaging.setBackgroundMessageHandler(payload => {
 
 self.addEventListener('notificationclick', event => {
     if (event.action == 'ver') {
-        //clients.openWindow('https://blogeekplatzi.firebaseapp.com/posts')
+        //clients.openWindow('')
     }
 })

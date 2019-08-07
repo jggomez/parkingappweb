@@ -36,7 +36,7 @@ $(() => {
     console.log(idEntrada);
 
     const calcularCostoParqueo =
-      firebase.functions().httpsCallable('calcularCostoParqueo');
+      firebase.functions().httpsCallable('calcularCostoParqueadero');
 
     const resp = await calcularCostoParqueo({
       idEntrada: idEntrada

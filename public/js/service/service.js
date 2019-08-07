@@ -15,7 +15,7 @@ $(() => {
 
     // credenciales web
     messaging.usePublicVapidKey(
-        'BEpeOB8sxEPuVfG4pYz8-BRhR5inzRt35w3qBwzb4B2kqEeM_CwpNtu-kKFo3O2qTm7nmqGy2jgfj_OZePvwpJo'
+        'BNGlYa7JfeAGX8ewN18my-EcpsLLxQrsERNKK4vCm5tgJA2Q4Url5eDRoteqhs3jTcjuScmjhhdv3DvpYJLaV7Q'
     )
 
     // Solicitar permisos para las notificaciones
@@ -30,7 +30,8 @@ $(() => {
             console.log(token);
             const db = firebase.firestore();
             db.collection('tokens')
-                .add({
+                .doc(token)
+                .set({
                     token: token
                 })
                 .catch(err => {
@@ -43,6 +44,7 @@ $(() => {
 
     // Recibir las notificaciones cuando el usuario esta foreground
     messaging.onMessage(payload => {
+        console.log(`Parqueadero disponible el ${payload.data.nombreparqueadero}`);
         Materialize.toast(
             `Parqueadero disponible el ${payload.data.nombreparqueadero}`,
             6000
@@ -57,7 +59,8 @@ $(() => {
                 console.log('Token refreshed.')
                 const db = firebase.firestore();
                 db.collection('tokens')
-                    .add({
+                    .doc(token)
+                    .set({
                         token: token
                     })
                     .catch(err => {
